@@ -1,0 +1,58 @@
+{
+  "dashboard": {
+    "categories": [
+      {
+        "id": "category1",
+        "name": "CSPM Executive Dashboard",
+        "widgets": [
+          {
+            "id": "widget1",
+            "type": "pie",
+            "title": " Cloud accounts",
+            "dataSource": "/api/sales/monthly",
+            "settings": {
+              "labels": ["Product A", "Product B"],
+              "data": [50, 50],
+              "colors": ["#FFCE56", "#36A2EB"]
+            }
+          },
+          {
+            "id": "widget2",
+            "type": "pie",
+            "title": "Cloud account risk assessment",
+            "dataSource": "/api/sales/top-products",
+            "settings": {
+              "labels": ["Product A", "Product B", "Product C"],
+              "data": [30, 50, 20],
+              "colors": ["#FF6384", "#36A2EB", "#FFCE56"]
+            }
+          }
+        ]
+      },
+      {
+        "id": "category1",
+        "name": "CWPP Dashboard",
+        "widgets": [
+          {
+            "id": "widget1",
+            "type": "pie",
+            "title": "Top 5 namespace Specific alerts",
+            "dataSource": "/api/sales/monthly",
+            "settings": {
+              "labels": ["No graph data available"]
+            }
+          },
+          {
+            "id": "widget2",
+            "type": "pie",
+            "title": "Workload alert",
+            "dataSource": "/api/sales/top-products",
+            "settings": {
+              "labels": ["No graph data available"]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
