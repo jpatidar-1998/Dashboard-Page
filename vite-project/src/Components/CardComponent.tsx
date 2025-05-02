@@ -112,7 +112,6 @@ const CardComponent: React.FC<CardComponentProps> = ({ searchQuery }) => {
 
     if (category) {
       console.log("Before removing widget:", category.widgets);
-      // Filter out the widget with the matching widgetId
       category.widgets = category.widgets.filter(
         (widget) => widget.id !== widgetId
       );

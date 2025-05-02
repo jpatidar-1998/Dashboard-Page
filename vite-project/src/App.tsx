@@ -8,16 +8,14 @@ function App() {
 
   return (
     <>
-      {/* Search Box */}
       <TextField
         label="Search Widgets"
         fullWidth
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        style={{ marginBottom: "20px" }}
+        style={{ marginBottom: "60px", height: "10px", width: "200px" }}
       />
 
-      {/* Pass searchQuery to Dashboard */}
       <Dashboard searchQuery={searchQuery} />
     </>
   );

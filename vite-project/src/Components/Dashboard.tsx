@@ -32,6 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ searchQuery }) => {
         style={{
           display: "flex",
           justifyContent: "space-between",
+          alignContent: "center",
           alignItems: "center",
           marginBottom: "20px"
         }}
@@ -48,12 +49,18 @@ const Dashboard: React.FC<DashboardProps> = ({ searchQuery }) => {
         >
           CNAPP Dashboard
         </span>
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end"
+          }}
+        >
           <Button
             variant="outlined"
             component="label"
             style={{
-              marginRight: "10px",
+              alignItems: "center",
+              marginRight: "4px",
               borderColor: "#a9a9a9",
               color: "#a9a9a9"
             }}
@@ -79,10 +86,9 @@ const Dashboard: React.FC<DashboardProps> = ({ searchQuery }) => {
             variant="outlined"
             component="label"
             style={{
-              marginBottom: "10px",
-              marginRight: "4px",
               borderColor: "#a9a9a9",
-              color: "#a9a9a9"
+              color: "#a9a9a9",
+              marginRight: "4px"
             }}
           >
             <svg
@@ -105,9 +111,8 @@ const Dashboard: React.FC<DashboardProps> = ({ searchQuery }) => {
             variant="outlined"
             component="label"
             style={{
-              marginBottom: "10px",
-              marginRight: "4px",
-              borderColor: "#a9a9a9"
+              borderColor: "#a9a9a9",
+              marginRight: "4px"
             }}
           >
             <svg
@@ -189,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({ searchQuery }) => {
           setSelectedCategoryId={setSelectedCategoryId}
         />
       </Box>
-      
+
       {isSidebarOpen && (
         <div
           style={{
