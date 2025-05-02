@@ -1,8 +1,25 @@
 import { useEffect, useState } from "react";
 import PieChartComponent from "./PieChartComponent";
-import { Box, Button, Card } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  List,
+  ListItem,
+  ListItemText,
+  Modal,
+  TextField
+} from "@mui/material";
 
-const CardComponent = () => {
+interface CardComponentProps {
+  searchQuery: string;
+  isModalOpen: boolean;
+  setIsModalOpen: (open: boolean) => void;
+  selectedCategoryId: string | null;
+  setSelectedCategoryId: (id: string | null) => void;
+}
+
+const CardComponent: React.FC<CardComponentProps> = ({ searchQuery }) => {
   interface WidgetSettings {
     labels?: string[];
     data?: number[];
@@ -29,6 +46,12 @@ const CardComponent = () => {
   }
 
   const [data, setData] = useState<DashboardData | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newWidgetTitle, setNewWidgetTitle] = useState("");
+  const [newWidgetText, setNewWidgetText] = useState("");
 
   useEffect(() => {
     fetch("/json/widget.json")
@@ -45,8 +68,83 @@ const CardComponent = () => {
         console.error("Error fetching JSON:", error);
       });
   }, []);
+
+  const handleAddWidget = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveWidget = () => {
+    if (!selectedCategoryId || !newWidgetTitle || !newWidgetText) return;
+
+    const updatedData = {
+      ...data,
+      dashboard: { categories: data?.dashboard?.categories || [] }
+    };
+    const category = updatedData.dashboard?.categories.find(
+      (cat) => cat.id === selectedCategoryId
+    );
+
+    if (category) {
+      category.widgets.push({
+        id: `widget-${Date.now()}`, // Unique ID
+        type: "custom", // Example type
+        title: newWidgetTitle,
+        settings: {
+          labels: [newWidgetText]
+        }
+      });
+    }
+
+    setData(updatedData as DashboardData);
+    setIsModalOpen(false);
+    setNewWidgetTitle("");
+    setNewWidgetText("");
+  };
+
+  const handleRemoveWidget = (categoryId: string, widgetId: string) => {
+    if (!data) return;
+
+    const updatedData = { ...data };
+    const category = updatedData.dashboard.categories.find(
+      (cat) => cat.id === categoryId
+    );
+
+    if (category) {
+      console.log("Before removing widget:", category.widgets);
+      // Filter out the widget with the matching widgetId
+      category.widgets = category.widgets.filter(
+        (widget) => widget.id !== widgetId
+      );
+      console.log("After removing widget:", category.widgets);
+    }
+
+    setData(updatedData as DashboardData);
+  };
+
+  const filteredWidgets = data
+    ? data.dashboard.categories.flatMap((category) =>
+        category.widgets.filter((widget) =>
+          widget.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+    : [];
+
   return (
     <div className="flex flex-col">
+      {/* Conditionally Render Search Results */}
+      {searchQuery.trim() && filteredWidgets.length > 0 && (
+        <List style={{ zIndex: 50 }}>
+          {filteredWidgets.map((widget) => (
+            <ListItem key={widget.id}>
+              <ListItemText
+                primary={widget.title}
+                secondary={widget.settings.labels?.[0]}
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
       {data ? (
         <Box
           style={{
@@ -71,7 +169,8 @@ const CardComponent = () => {
                   style={{
                     display: "flex",
                     justifyContent: "flex-start",
-                    alignContent: "flex-start"
+                    alignContent: "flex-start",
+                    fontSize: "20px"
                   }}
                 >
                   {category.name}
@@ -149,6 +248,13 @@ const CardComponent = () => {
                         </div>
                       )}
                     </div>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleRemoveWidget(category.id, widget.id)}
+                    >
+                      Remove
+                    </Button>
                   </Box>
                 ))}
 
@@ -156,7 +262,7 @@ const CardComponent = () => {
                   { length: Math.max(0, 3 - category.widgets.length) },
                   (_, index) => (
                     <Box
-                      key={`placeholder-${index}`}
+                      key={`placeholder-${category.id}-${index}`}
                       style={{
                         borderRadius: "10px",
                         padding: "20px",
@@ -172,10 +278,10 @@ const CardComponent = () => {
                     >
                       <Button
                         variant="outlined"
-                        component="label"
                         style={{
                           marginBottom: "10px"
                         }}
+                        onClick={() => handleAddWidget(category.id)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +298,6 @@ const CardComponent = () => {
                           />
                         </svg>
                         Add Widget
-                        <input type="file" hidden />
                       </Button>
                     </Box>
                   )
@@ -204,6 +309,42 @@ const CardComponent = () => {
       ) : (
         <p>Loading...</p>
       )}
+
+      {/* Modal for Adding Widget */}
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Box
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "400px",
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)"
+          }}
+        >
+          <h3>Add Widget</h3>
+          <TextField
+            label="Widget Title"
+            fullWidth
+            value={newWidgetTitle}
+            onChange={(e) => setNewWidgetTitle(e.target.value)}
+            style={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Widget Text"
+            fullWidth
+            value={newWidgetText}
+            onChange={(e) => setNewWidgetText(e.target.value)}
+            style={{ marginBottom: "10px" }}
+          />
+          <Button variant="contained" onClick={handleSaveWidget}>
+            Save
+          </Button>
+        </Box>
+      </Modal>
     </div>
   );
 };
